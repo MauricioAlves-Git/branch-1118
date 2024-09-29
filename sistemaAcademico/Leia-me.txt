@@ -1,0 +1,11 @@
+Passo a Passo de como configurar o Moodle Localmente
+
+1º Instalar o xampp.
+2º Criar um banco de dados com o nome "moodle" no Maria DB com o login que está na pasta "Banco de Dados Moodle", Print "nome e senha banco moodle".
+3º Copiar a Pasta moodle pra dentro do htdocs do xampp.
+4º Chamar pela URL a tela inicial do moodle: localhost/moodle.
+5º Substituir a pasta moodledata que fica dentro da pasta xampp.
+6º fazer o login conforme print "Usuário e senha Moodle"  que está na pasta "Banco de Dados Moodle".
+7º Atualizar os Plugins se mostrar pra atualizar.
+8º chamar a index na URL: http://localhost/moodle/contagem/index.php
+9º Se pedir usuário logar com o administrador que está no print "Usuário e senha Moodle" dentro da pasta "Banco de Dados Moodle".
