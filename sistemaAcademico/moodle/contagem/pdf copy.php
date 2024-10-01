@@ -71,15 +71,13 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
             $active_users[] = [
                 'fullname' => $user['fullname'],
                 'email' => $user['email'],
-                'enrolldate' => $enrolldate,
-                'status' => 'Ativo'
+                'enrolldate' => $enrolldate
             ];
         } else {
             $suspended_users[] = [
                 'fullname' => $user['fullname'],
                 'email' => $user['email'],
-                'enrolldate' => $enrolldate,
-                'status' => 'Suspenso'
+                'enrolldate' => $enrolldate
             ];
         }
     }
@@ -108,7 +106,6 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
                             <th>Nome Completo</th>
                             <th>E-mail</th>
                             <th>Data de Inscrição</th>
-                            <th>Status</th> <!-- Nova coluna Status -->
                         </tr>
                     </thead>
                     <tbody>';
@@ -117,7 +114,6 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
                         <td>' . htmlspecialchars($user['fullname']) . '</td>
                         <td>' . htmlspecialchars($user['email']) . '</td>
                         <td>' . htmlspecialchars($user['enrolldate']) . '</td>
-                        <td>' . htmlspecialchars($user['status']) . '</td> <!-- Exibindo o Status -->
                       </tr>';
         }
         $html .= '</tbody></table>';
@@ -134,7 +130,6 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
                             <th>Nome Completo</th>
                             <th>E-mail</th>
                             <th>Data de Inscrição</th>
-                            <th>Status</th> <!-- Nova coluna Status -->
                         </tr>
                     </thead>
                     <tbody>';
@@ -143,7 +138,6 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
                         <td>' . htmlspecialchars($user['fullname']) . '</td>
                         <td>' . htmlspecialchars($user['email']) . '</td>
                         <td>' . htmlspecialchars($user['enrolldate']) . '</td>
-                        <td>' . htmlspecialchars($user['status']) . '</td> <!-- Exibindo o Status -->
                       </tr>';
         }
         $html .= '</tbody></table>';
