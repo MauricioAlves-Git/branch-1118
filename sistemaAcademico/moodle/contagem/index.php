@@ -127,12 +127,12 @@ include('navbar.php');
                             <a href='webservice.php?course_id={$curso->course_id}' class='btn btn-secondary btn-sm'>
                               <span class='bi-eye-fill'></span>&nbsp;Visualizar
                             </a>
-                            <a href='usuario-edit.php?id={$curso->course_id}' class='btn btn-success btn-sm'>
-                              <span class='bi-pencil-fill'></span>&nbsp;Editar
-                            </a>
-                            <form action='acoes.php' method='POST' class='d-inline'>
-                              <button onclick=\"return confirm('Tem certeza que deseja excluir?')\" type='submit' name='delete_usuario' value='{$curso->course_id}' class='btn btn-danger btn-sm'>
-                                <span class='bi-trash3-fill'></span>&nbsp;Excluir
+                          <a href='relatorio.php?course_id={$curso->course_id}' class='btn btn-success btn-sm'>
+  <span class='bi-file-earmark-text'></span>&nbsp;Relatório XLSX
+</a>
+<a href='pdf.php?course_id={$curso->course_id}' class='btn btn-danger btn-sm'>
+  <span class='bi-file-earmark-text'></span>&nbsp;Relatório PDF
+</a>
                               </button>
                             </form>
                           </td>";
