@@ -1,5 +1,5 @@
 <?php
-require_once("../config.php");
+require_once "../config.php";
 require_login(); // Exige que o usuário esteja logado
 ?>
 
@@ -53,37 +53,40 @@ require_login(); // Exige que o usuário esteja logado
     </style>
 </head>
 <body>
-    <?php include('navbar.php'); ?>
+    <?php include 'navbar.php';?>
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <?php 
-                        // Verifica se o ID do curso foi passado via GET
-                        if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
-                            $courseid = intval($_GET['course_id']); // Captura o ID do curso da URL
+                        <?php
+// Verifica se o ID do curso foi passado via GET
+if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
+    $courseid = intval($_GET['course_id']); // Captura o ID do curso da URL
 
-                            // Consulta para buscar o nome do curso
-                            $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-                            $course_name = $course->fullname; // Nome completo do curso
+    // Consulta para buscar o nome do curso
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $course_name = $course->fullname; // Nome completo do curso
 
-                            // Exibir o nome do curso no título
-                            echo "<h4>Alunos Inscritos: " . htmlspecialchars($course_name) . "
-                                <a href='index.php' class='btn btn-danger float-end'>Voltar</a>
-                            </h4>";
-                        } else {
-                            echo "<div class='alert alert-danger'>ID do curso não fornecido ou inválido.</div>";
-                            exit();
-                        }
-                        ?>
+    // Exibir o nome do curso no título
+    echo "<h4>Alunos Inscritos: " . htmlspecialchars($course_name) . "
+                            <a href='index.php' class='btn btn-primary float-end'>
+                                <i class='fas fa-arrow-left'></i> Voltar
+                            </a>
+                        </h4>";
+
+} else {
+    echo "<div class='alert alert-danger'>ID do curso não fornecido ou inválido.</div>";
+    exit();
+}
+?>
                     </div>
                     <div class="card-body">
-<?php 
+<?php
 // Defina a URL do seu Moodle e o token do usuário com permissões adequadas.
-$token = '7249c9e43a8c5d9ecb0dac7a7b8ef5d6';  // Substitua pelo seu token
-$domainname = 'http://localhost/moodle/';   // URL do seu Moodle
-$functionname = 'core_enrol_get_enrolled_users';  // Função para listar usuários inscritos
+$token = '7249c9e43a8c5d9ecb0dac7a7b8ef5d6'; // Substitua pelo seu token
+$domainname = 'http://localhost/moodle/'; // URL do seu Moodle
+$functionname = 'core_enrol_get_enrolled_users'; // Função para listar usuários inscritos
 
 // Defina o formato de retorno (geralmente JSON)
 $restformat = 'json';
@@ -101,7 +104,7 @@ $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $serverurl);
 curl_setopt($curl, CURLOPT_POST, true);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($params));  
+curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($params));
 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
 
 // Executando a requisição
@@ -126,7 +129,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 if (isset($enrolled_users['exception'])) {
     echo "<div class='alert alert-danger'>Erro: " . htmlspecialchars($enrolled_users['message']) . "</div>";
 } else {
-    
+
     // Separar os usuários por status
     $active_users = [];
     $suspended_users = [];
@@ -134,11 +137,11 @@ if (isset($enrolled_users['exception'])) {
     // Para cada usuário, consultar diretamente a tabela mdl_user_enrolments
     foreach ($enrolled_users as $user) {
         $userid = intval($user['id']);
-        
+
         // Buscar a data de inscrição e o status diretamente no banco de dados
-        $sql = "SELECT ue.timecreated, ue.status 
-                FROM {user_enrolments} ue 
-                JOIN {enrol} e ON ue.enrolid = e.id 
+        $sql = "SELECT ue.timecreated, ue.status
+                FROM {user_enrolments} ue
+                JOIN {enrol} e ON ue.enrolid = e.id
                 WHERE ue.userid = :userid AND e.courseid = :courseid";
         $enrol_data = $DB->get_record_sql($sql, ['userid' => $userid, 'courseid' => $courseid]);
 
@@ -151,61 +154,61 @@ if (isset($enrolled_users['exception'])) {
             $active_users[] = [
                 'fullname' => $user['fullname'],
                 'email' => $user['email'],
-                'enrolldate' => $enrolldate
+                'enrolldate' => $enrolldate,
             ];
         } else {
             $suspended_users[] = [
                 'fullname' => $user['fullname'],
                 'email' => $user['email'],
-                'enrolldate' => $enrolldate
+                'enrolldate' => $enrolldate,
             ];
         }
     }
 
-   // Exibe as tabelas
-   echo '<h5>Alunos Ativos</h5>';
-   if (!empty($active_users)) {
-       echo '<table>
+    // Exibe as tabelas
+    echo '<h5>Alunos Ativos</h5>';
+    if (!empty($active_users)) {
+        echo '<table>
                <tr>
                    <th>Nome Completo</th>
                    <th>E-mail</th>
                    <th>Data de Inscrição</th>
                    <th>Status</th> <!-- Nova coluna de status -->
                </tr>';
-       foreach ($active_users as $user) {
-           echo '<tr>
+        foreach ($active_users as $user) {
+            echo '<tr>
                    <td>' . htmlspecialchars($user['fullname']) . '</td>
                    <td>' . htmlspecialchars($user['email']) . '</td>
                    <td>' . htmlspecialchars($user['enrolldate']) . '</td>
                    <td>Ativo</td> <!-- Exibindo o status Ativo -->
                  </tr>';
-       }
-       echo '</table>';
-   } else {
-       echo '<p>Nenhum aluno ativo encontrado.</p>';
-   }
+        }
+        echo '</table>';
+    } else {
+        echo '<p>Nenhum aluno ativo encontrado.</p>';
+    }
 
-   echo '<h5>Alunos Suspensos</h5>';
-   if (!empty($suspended_users)) {
-       echo '<table>
+    echo '<h5>Alunos Suspensos</h5>';
+    if (!empty($suspended_users)) {
+        echo '<table>
                <tr>
                    <th>Nome Completo</th>
                    <th>E-mail</th>
                    <th>Data de Inscrição</th>
                    <th>Status</th> <!-- Nova coluna de status -->
                </tr>';
-       foreach ($suspended_users as $user) {
-           echo '<tr>
+        foreach ($suspended_users as $user) {
+            echo '<tr>
                    <td>' . htmlspecialchars($user['fullname']) . '</td>
                    <td>' . htmlspecialchars($user['email']) . '</td>
                    <td>' . htmlspecialchars($user['enrolldate']) . '</td>
                    <td>Suspenso</td> <!-- Exibindo o status Suspenso -->
                  </tr>';
-       }
-       echo '</table>';
-   } else {
-       echo '<p>Nenhum aluno suspenso encontrado.</p>';
-   }
+        }
+        echo '</table>';
+    } else {
+        echo '<p>Nenhum aluno suspenso encontrado.</p>';
+    }
 
 }
 ?>
@@ -214,7 +217,7 @@ if (isset($enrolled_users['exception'])) {
             </div> <!-- Fechando a div col-md-12 -->
         </div> <!-- Fechando a div row -->
     </div> <!-- Fechando a div container -->
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

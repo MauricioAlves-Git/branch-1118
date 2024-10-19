@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing; // Classe para adicionar imagens
 
 // Verifica se o ID do curso foi passado via GET
 if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
@@ -75,17 +76,26 @@ $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle('Relatório de Inscritos');
 
-// Adicionar o título com o nome do curso
-$sheet->setCellValue('A1', 'Relatório de Inscritos - ' . $course->fullname);
-$sheet->mergeCells('A1:D1'); // Mescla as células A1 a D1
-$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14); // Define o título como negrito e tamanho 14
-$sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Centraliza o texto
+// Adicionar a imagem no canto superior esquerdo
+$drawing = new Drawing();
+$drawing->setName('Logo');
+$drawing->setDescription('Logo');
+$drawing->setPath('http://localhost/moodle/contagem/img/logo.png'); // Substitua pelo caminho correto da imagem
+$drawing->setHeight(80); // Definir a altura da imagem
+$drawing->setCoordinates('A1'); // Posicionar a imagem na célula A1
+$drawing->setWorksheet($sheet); // Adicionar à planilha
 
-// Definindo cabeçalho da tabela (A2, B2, etc.)
-$sheet->setCellValue('A2', 'Nome Completo');
-$sheet->setCellValue('B2', 'E-mail');
-$sheet->setCellValue('C2', 'Data de Inscrição');
-$sheet->setCellValue('D2', 'Status');
+// Adicionar o título com o nome do curso abaixo da imagem
+$sheet->setCellValue('A5', 'Relatório de Inscritos - ' . $course->fullname);
+$sheet->mergeCells('A5:D5'); // Mescla as células A5 a D5
+$sheet->getStyle('A5')->getFont()->setBold(true)->setSize(14); // Define o título como negrito e tamanho 14
+$sheet->getStyle('A5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Centraliza o texto
+
+// Definindo cabeçalho da tabela (A6, B6, etc.)
+$sheet->setCellValue('A6', 'Nome Completo');
+$sheet->setCellValue('B6', 'E-mail');
+$sheet->setCellValue('C6', 'Data de Inscrição');
+$sheet->setCellValue('D6', 'Status');
 
 // Estilizando os cabeçalhos
 $headerStyle = [
@@ -110,7 +120,7 @@ $headerStyle = [
 ];
 
 // Aplicando estilo aos cabeçalhos
-$sheet->getStyle('A2:D2')->applyFromArray($headerStyle);
+$sheet->getStyle('A6:D6')->applyFromArray($headerStyle);
 
 // Ajustando a largura das colunas automaticamente
 foreach (range('A', 'D') as $columnID) {
@@ -155,7 +165,7 @@ foreach ($enrolled_users as $user) {
 }
 
 // Definir título "Alunos Ativos"
-$row = 3;
+$row = 7;
 $sheet->setCellValue('A' . $row, 'Alunos Ativos');
 $sheet->mergeCells('A' . $row . ':D' . $row); 
 $sheet->getStyle('A' . $row)->getFont()->setBold(true);
@@ -194,5 +204,4 @@ header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 exit;
-
 ?>

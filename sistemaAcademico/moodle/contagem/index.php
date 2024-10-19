@@ -1,7 +1,7 @@
 <?php
-require_once("../config.php");
+require_once "../config.php";
 require_login(); // Exige que o usuário esteja logado
-include('navbar.php'); 
+include 'navbar.php';
 ?>
 
 <!doctype html>
@@ -60,94 +60,94 @@ include('navbar.php');
 
   <body>
     <div class="container">
-      <?php include('mensagem.php'); ?>
+      <?php include 'mensagem.php';?>
       <div class="row">
         <div class="col-md-12">
           <div class="card">
             <div class="card-header">
               <h4> Lista de Cursos e Inscritos
-                <a href="usuario-creat.php" class="btn btn-primary float-end">Adicionar usuário</a>
+              <a href="usuario-creat.php" class="btn btn-primary float-end"><i class="bi bi-person-plus"></i> Novo Usuário</a>
               </h4>
             </div>
             <div class="card-body">
               <?php
-              // Configurações da página
-              $PAGE->set_url(new moodle_url('/localhost/moodle/'));
-              $PAGE->set_context(context_system::instance());
-              $PAGE->set_title('Relatório de Cursos');
-              $PAGE->set_heading('Relatório de Cursos');
+// Configurações da página
+$PAGE->set_url(new moodle_url('/localhost/moodle/'));
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title('Relatório de Cursos');
+$PAGE->set_heading('Relatório de Cursos');
 
-              // Cabeçalho da página
-              echo $OUTPUT->header();
+// Cabeçalho da página
+echo $OUTPUT->header();
 
-              // SQL para consultar cursos, alunos inscritos e data de criação
-              global $DB;
-              $sql = "SELECT 
-                          c.id AS course_id,
-                          c.fullname AS course_name,
-                          COUNT(ue.userid) AS enrolled_students,
-                          FROM_UNIXTIME(c.timecreated, '%d/%m/%Y') AS creation_date
-                      FROM 
-                          {course} c
-                      LEFT JOIN 
-                          {enrol} e ON e.courseid = c.id
-                      LEFT JOIN 
-                          {user_enrolments} ue ON ue.enrolid = e.id
-                      GROUP BY 
-                          c.id, c.fullname, c.timecreated
-                      ORDER BY 
-                          enrolled_students DESC";
+// SQL para consultar cursos, alunos inscritos e data de criação
+global $DB;
+$sql = "SELECT
+            c.id AS course_id,
+            c.fullname AS course_name,
+            COUNT(DISTINCT ue.userid) AS enrolled_students,
+            FROM_UNIXTIME(c.timecreated, '%d/%m/%Y') AS creation_date
+        FROM
+            {course} c
+        LEFT JOIN
+            {enrol} e ON e.courseid = c.id
+        LEFT JOIN
+            {user_enrolments} ue ON ue.enrolid = e.id
+        LEFT JOIN
+            {user} u ON u.id = ue.userid
+        WHERE
+            u.deleted = 0 AND u.suspended = 0
+        GROUP BY
+            c.id, c.fullname, c.timecreated
+        ORDER BY
+            enrolled_students DESC";
 
-              // Executando a consulta
-              $cursos = $DB->get_records_sql($sql);
+// Executando a consulta
+$cursos = $DB->get_records_sql($sql);
 
-              // Exibindo os resultados em uma tabela HTML
-              if (!empty($cursos)) {
-                  echo "<h3>Relatório de Cursos, Alunos Inscritos e Data de Criação:</h3>";
-                  echo '<table class="table table-hover table-striped table-bordered">
-                          <thead>
-                            <tr>
-                              <th>ID</th>
-                              <th>Nome do Curso</th>
-                              <th>Alunos Inscritos</th>
-                              <th>Data de Criação</th>
-                              <th>Ações</th>
-                            </tr>
-                          </thead>
-                          <tbody>';
+// Exibindo os resultados em uma tabela HTML
+if (!empty($cursos)) {
+    echo "<h3>Relatório de Cursos, Alunos Inscritos e Data de Criação:</h3>";
+    echo '<table class="table table-hover table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Nome do Curso</th>
+              <th>Alunos Inscritos</th>
+              <th>Data de Criação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>';
 
-                  // Loop pelos cursos
-                  foreach ($cursos as $curso) {
-                    echo "<tr>";
-                    echo "<td>{$curso->course_id}</td>";
-                    echo "<td>{$curso->course_name}</td>";
-                    echo "<td>{$curso->enrolled_students}</td>";
-                    echo "<td>{$curso->creation_date}</td>";
-                    echo "<td>
-                            <a href='webservice.php?course_id={$curso->course_id}' class='btn btn-secondary btn-sm'>
-                              <span class='bi-eye-fill'></span>&nbsp;Visualizar
-                            </a>
-                          <a href='relatorio.php?course_id={$curso->course_id}' class='btn btn-success btn-sm'>
-  <span class='bi-file-earmark-text'></span>&nbsp;Relatório XLSX
-</a>
-<a href='pdf.php?course_id={$curso->course_id}' class='btn btn-danger btn-sm'>
-  <span class='bi-file-earmark-text'></span>&nbsp;Relatório PDF
-</a>
-                              </button>
-                            </form>
-                          </td>";
-                    echo "</tr>";
-                  }
+    // Loop pelos cursos
+    foreach ($cursos as $curso) {
+        echo "<tr>";
+        echo "<td>{$curso->course_name}</td>";
+        echo "<td>{$curso->enrolled_students}</td>";
+        echo "<td>{$curso->creation_date}</td>";
+        echo "<td>
+                  <a href='web_delete.php?course_id={$curso->course_id}' class='btn btn-secondary btn-sm'>
+                    <span class='bi-eye-fill'></span>&nbsp;Visualizar
+                  </a>
+                  <a href='relatorio.php?course_id={$curso->course_id}' class='btn btn-success btn-sm'>
+                    <span class='bi-file-earmark-text'></span>&nbsp;Relatório XLSX
+                  </a>
+                  <a href='pdf.php?course_id={$curso->course_id}' class='btn btn-danger btn-sm'>
+                    <span class='bi-file-earmark-text'></span>&nbsp;Relatório PDF
+                  </a>
+              </td>";
+        echo "</tr>";
+    }
 
-                  echo '</tbody>
-                        </table>';
-              } else {
-                  echo '<h5 class="text-center text-muted">Nenhum curso encontrado</h5>';
-              }
+    echo '</tbody>
+        </table>';
+} else {
+    echo '<h5 class="text-center text-muted">Nenhum curso encontrado</h5>';
+}
 
-              // Rodapé da página
-              echo $OUTPUT->footer();
-              ?>
+// Rodapé da página
+echo $OUTPUT->footer();
+?>
             </div> <!-- Fechando a div card-body -->
           </div> <!-- Fechando a div card -->
         </div> <!-- Fechando a div col-md-12 -->
